@@ -45,14 +45,10 @@ const title = ref('Hello')
 
 <style lang="scss" scoped>
 .scss-title {
-  font-size: $title-size;
-  color: $title-color;
 }
 </style>
 
 <style lang="less" scoped>
 .less-title {
-  font-size: @title-size;
-  color: @title-color;
 }
 </style>

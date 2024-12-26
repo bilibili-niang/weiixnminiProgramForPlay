@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import './index.less'
 import { reactive } from 'vue'
 import Hello from '@/components/hello/index.vue'
 import UnoCss from '@/components/unocss/index.vue'
