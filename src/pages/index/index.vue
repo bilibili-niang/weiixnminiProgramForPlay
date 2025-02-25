@@ -2,11 +2,16 @@
   <view class="index-page">
     <Hello />
     <UnoCss />
-    <text class="h2"> 查看其它页面示例↓ </text>
+    <text class="h2"> 查看其它页面示例↓</text>
     <view>
-      <navigator v-for="(v, idx) in pages" :key="idx" :url="v.url">{{
-        v.title
-      }}</navigator>
+      <navigator
+        v-for="(v, idx) in pages"
+        :key="idx"
+        :url="v.url"
+        open-type="navigate"
+      >
+        {{ v.title }}
+      </navigator>
     </view>
   </view>
 </template>
@@ -18,6 +23,10 @@ import Hello from '@/components/hello/index.vue'
 import UnoCss from '@/components/unocss/index.vue'
 
 const pages = reactive([
+  {
+    title: '今天吃什么?',
+    url: '/pages/lucky-wheel/index'
+  },
   {
     title: 'Pinia Demo',
     url: '/pages/pinia/index'

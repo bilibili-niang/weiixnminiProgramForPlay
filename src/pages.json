@@ -13,6 +13,12 @@
       }
     },
     {
+      "path": "pages/lucky-wheel/index",
+      "style": {
+        "navigationBarTitleText": "今天吃什么"
+      }
+    },
+    {
       "path": "pages/axios/index",
       "style": {
         "navigationBarTitleText": "Axios（网络请求示例）"
