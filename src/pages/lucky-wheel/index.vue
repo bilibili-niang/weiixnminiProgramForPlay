@@ -5,7 +5,12 @@
 
       <view class="wheel-container">
         <!-- 静态转盘 -->
-        <view class="wheel" :style="{ transform: `rotate(${wheelRotation}deg)` }">
+        <view 
+          class="wheel" 
+          :style="{ 
+            transform: `rotate(${wheelRotation}deg)`,
+          }"
+        >
           <view v-for="(item, idx) in foodList" :key="idx" class="wheel-section" :style="getSectionStyle(idx)">
             <text class="wheel-text" :style="getTextStyle(idx, wheelRotation)">{{ item }}</text>
           </view>
@@ -27,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 
 const foodList = [
   '火锅',
@@ -43,27 +48,10 @@ const foodList = [
   '盖浇饭',
   '煲仔饭'
 ]
+
 const isRotating = ref(false)
 const currentResult = ref('')
 const wheelRotation = ref(0)
-
-// 计算扇区样式
-const getSectionStyle = (index: number) => {
-  const rotate = (index * 360) / foodList.length
-  return {
-    transform: `rotate(${rotate}deg)`,
-    background: index % 2 === 0 ? '#FF9999' : '#99FF99'
-  }
-}
-
-// 计算文字样式
-const getTextStyle = (index: number, currentRotation: number) => {
-  const baseRotation = (index * 360) / foodList.length
-  return {
-    transform: `rotate(${-baseRotation - currentRotation}deg)`,
-    transition: 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)'
-  }
-}
 
 // 震动函数
 const vibrate = () => {
@@ -83,7 +71,7 @@ const startRotation = () => {
 
   const randomRotations = 5 + Math.floor(Math.random() * 5) // 5-10圈
   const extraDegrees = Math.random() * 360
-  const totalRotation = randomRotations * 360 + extraDegrees
+  const totalRotation = randomRotations * 360 + extraDegrees + 360 // 额外加一圈确保始终是正向旋转
 
   wheelRotation.value = totalRotation
 
@@ -94,17 +82,35 @@ const startRotation = () => {
       return
     }
     vibrate()
-  }, 200) // 每200ms震动一次
+  }, 200)
 
   setTimeout(() => {
     isRotating.value = false
-    clearInterval(vibrateInterval) // 清除震动定时器
-    vibrate() // 最后震动一次表示结束
+    clearInterval(vibrateInterval)
+    vibrate()
     const finalPosition = totalRotation % 360
     const sectionSize = 360 / foodList.length
     const selectedIndex = Math.floor((360 - (finalPosition % 360)) / sectionSize)
     currentResult.value = foodList[selectedIndex]
   }, 3000)
+}
+
+// 计算扇区样式
+const getSectionStyle = (index: number) => {
+  const rotate = (index * 360) / foodList.length
+  return {
+    transform: `rotate(${rotate}deg)`,
+    background: index % 2 === 0 ? '#FF9999' : '#99FF99'
+  }
+}
+
+// 计算文字样式
+const getTextStyle = (index: number, currentRotation: number) => {
+  const baseRotation = (index * 360) / foodList.length
+  return {
+    transform: `rotate(${-baseRotation - currentRotation}deg)`,
+    transition: 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+  }
 }
 </script>
 
@@ -165,6 +171,7 @@ const startRotation = () => {
   font-weight: bold;
   transform-origin: center;
   white-space: nowrap;
+  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .wheel {
