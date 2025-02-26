@@ -5,7 +5,7 @@
 
       <view class="wheel-container">
         <!-- 静态转盘 -->
-        <view class="wheel" :class="{ 'rotating': isRotating }" :style="{ transform: `rotate(${wheelRotation}deg)` }">
+        <view class="wheel" :style="{ transform: `rotate(${wheelRotation}deg)` }">
           <view v-for="(item, idx) in foodList" :key="idx" class="wheel-section" :style="getSectionStyle(idx)">
             <text class="wheel-text" :style="getTextStyle(idx, wheelRotation)">{{ item }}</text>
           </view>
@@ -62,10 +62,11 @@ const getSectionStyle = (index: number) => {
 }
 
 // 计算文字样式
-const getTextStyle = (index: number, wheelRotation: number) => {
-  const rotate = (index * 360) / foodList.length
+const getTextStyle = (index: number, currentRotation: number) => {
+  const baseRotation = (index * 360) / foodList.length
   return {
-    transform: `rotate(${-rotate - wheelRotation + 90}deg)`
+    transform: `rotate(${-baseRotation - currentRotation}deg)`,
+    transition: 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)'
   }
 }
 
@@ -76,26 +77,19 @@ const startRotation = () => {
   isRotating.value = true
   currentResult.value = ''
 
-  // 重置当前角度
-  wheelRotation.value = 0
-  
-  // 使用 nextTick 确保角度重置已生效
-  nextTick(() => {
-    const randomRotations = 5 + Math.floor(Math.random() * 5) // 5-10圈
-    const extraDegrees = Math.random() * 360
-    const totalRotation = randomRotations * 360 + extraDegrees
+  const randomRotations = 5 + Math.floor(Math.random() * 5) // 5-10圈
+  const extraDegrees = Math.random() * 360
+  const totalRotation = randomRotations * 360 + extraDegrees
 
-    // 设置新的旋转角度
-    wheelRotation.value = totalRotation
+  wheelRotation.value = totalRotation
 
-    setTimeout(() => {
-      isRotating.value = false
-      const finalPosition = totalRotation % 360
-      const sectionSize = 360 / foodList.length
-      const selectedIndex = foodList.length - Math.floor(finalPosition / sectionSize) - 1
-      currentResult.value = foodList[selectedIndex]
-    }, 3000)
-  })
+  setTimeout(() => {
+    isRotating.value = false
+    const finalPosition = totalRotation % 360
+    const sectionSize = 360 / foodList.length
+    const selectedIndex = Math.floor((360 - (finalPosition % 360)) / sectionSize)
+    currentResult.value = foodList[selectedIndex]
+  }, 3000)
 }
 </script>
 
@@ -138,16 +132,6 @@ const startRotation = () => {
   margin: 0 auto;
 }
 
-.wheel {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  position: relative;
-  border: 8px solid #2c3e50;
-  overflow: hidden;
-  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
 .wheel-section {
   position: absolute;
   width: 50%;
@@ -159,13 +143,23 @@ const startRotation = () => {
 
 .wheel-text {
   position: absolute;
-  left: 70%;
-  top: 30%;
-  transform-origin: left center;
+  left: 60%;
+  top: 25%;
   font-size: 14px;
   color: #333;
   font-weight: bold;
+  transform-origin: center;
   white-space: nowrap;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  border: 8px solid #2c3e50;
+  overflow: hidden;
+  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* 中心按钮样式 */
