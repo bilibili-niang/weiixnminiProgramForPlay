@@ -25,14 +25,14 @@
     <view class="results-container">
       <view class="result-title">今日推荐</view>
       <view class="result-item"
-        >早餐: {{ todayResults.breakfast || '未选择' }}</view
-      >
+        >早餐: {{ todayResults.breakfast || '未选择' }}
+      </view>
       <view class="result-item"
-        >午餐: {{ todayResults.lunch || '未选择' }}</view
-      >
+        >午餐: {{ todayResults.lunch || '未选择' }}
+      </view>
       <view class="result-item"
-        >晚餐: {{ todayResults.dinner || '未选择' }}</view
-      >
+        >晚餐: {{ todayResults.dinner || '未选择' }}
+      </view>
     </view>
   </view>
 </template>
@@ -105,25 +105,21 @@ export default {
 .lucky-wheel-container {
   padding: 20px;
 }
-
 .wheels-container {
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
-
 .wheel-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px;
 }
-
 .wheel-title {
   font-size: 18px;
   font-weight: bold;
 }
-
 .wheel {
   width: 300px;
   height: 300px;
@@ -132,7 +128,6 @@ export default {
   border: 2px solid #333;
   transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-
 .wheel-section {
   position: absolute;
   width: 50%;
@@ -145,20 +140,17 @@ export default {
   justify-content: center;
   padding-left: 60px;
 }
-
 .results-container {
   margin-top: 30px;
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
-
 .result-title {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
 }
-
 .result-item {
   margin: 8px 0;
 }
