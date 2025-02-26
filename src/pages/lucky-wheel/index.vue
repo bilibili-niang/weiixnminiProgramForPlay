@@ -15,11 +15,6 @@
             {{ isRotating ? '转动中...' : 'GO!' }}
           </view>
         </view>
-
-        <!-- 指针 -->
-        <view class="pointer">
-          <view class="pointer-head"></view>
-        </view>
       </view>
 
       <!-- 结果容器 -->
@@ -70,6 +65,15 @@ const getTextStyle = (index: number, currentRotation: number) => {
   }
 }
 
+// 震动函数
+const vibrate = () => {
+  uni.vibrateShort({
+    success: function () {
+      console.log('震动成功');
+    }
+  });
+}
+
 // 开始旋转
 const startRotation = () => {
   if (isRotating.value) return
@@ -83,8 +87,19 @@ const startRotation = () => {
 
   wheelRotation.value = totalRotation
 
+  // 设置震动间隔
+  let vibrateInterval = setInterval(() => {
+    if (!isRotating.value) {
+      clearInterval(vibrateInterval)
+      return
+    }
+    vibrate()
+  }, 200) // 每200ms震动一次
+
   setTimeout(() => {
     isRotating.value = false
+    clearInterval(vibrateInterval) // 清除震动定时器
+    vibrate() // 最后震动一次表示结束
     const finalPosition = totalRotation % 360
     const sectionSize = 360 / foodList.length
     const selectedIndex = Math.floor((360 - (finalPosition % 360)) / sectionSize)
@@ -194,41 +209,7 @@ const startRotation = () => {
   font-size: 14px;
 }
 
-/* 指针样式 */
-.pointer {
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-  transition: transform 0.1s ease;
-}
-
-.pointer-head {
-  width: 20px;
-  height: 30px;
-  background: #e74c3c;
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  animation: pointerShake 0.3s ease infinite;
-}
-
-@keyframes pointerShake {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(2px); }
-  100% { transform: translateY(0); }
-}
-
-/* 转动时的指针动画 */
-.wheel.rotating + .pointer {
-  animation: pointerVibrate 0.1s ease-in-out infinite;
-}
-
-@keyframes pointerVibrate {
-  0% { transform: translateX(-50%) rotate(-2deg); }
-  50% { transform: translateX(-50%) rotate(2deg); }
-  100% { transform: translateX(-50%) rotate(-2deg); }
-}
-
+/* 结果容器 */
 .result-container {
   margin-top: 20px;
   /* 减小上边距 */
