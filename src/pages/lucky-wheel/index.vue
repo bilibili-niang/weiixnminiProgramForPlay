@@ -5,7 +5,7 @@
 
       <view class="wheel-container">
         <!-- 静态转盘 -->
-        <view class="wheel" :style="{ transform: `rotate(${wheelRotation}deg)` }">
+        <view class="wheel" :class="{ 'rotating': isRotating }" :style="{ transform: `rotate(${wheelRotation}deg)` }">
           <view v-for="(item, idx) in foodList" :key="idx" class="wheel-section" :style="getSectionStyle(idx)">
             <text class="wheel-text" :style="getTextStyle(idx, wheelRotation)">{{ item }}</text>
           </view>
@@ -22,7 +22,7 @@
         </view>
       </view>
 
-      <!-- 结果容器始终存在，使用透明度控制显示 -->
+      <!-- 结果容器 -->
       <view class="result-container" :class="{ 'show': currentResult }">
         <view class="result-title">建议吃：</view>
         <view class="result-text">{{ currentResult || '等待选择' }}</view>
@@ -34,7 +34,20 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 
-const foodList = ['面条', '米饭', '馒头', '饺子', '汉堡', '披萨', '沙拉', '炒饭']
+const foodList = [
+  '火锅',
+  '烤肉',
+  '面条',
+  '米饭',
+  '饺子',
+  '汉堡',
+  '披萨',
+  '炒菜',
+  '寿司',
+  '麻辣烫',
+  '盖浇饭',
+  '煲仔饭'
+]
 const isRotating = ref(false)
 const currentResult = ref('')
 const wheelRotation = ref(0)
@@ -48,14 +61,11 @@ const getSectionStyle = (index: number) => {
   }
 }
 
-// 计算文字样式，抵消旋转
+// 计算文字样式
 const getTextStyle = (index: number, wheelRotation: number) => {
-  const baseRotation = (index * 360) / foodList.length
-  // 文字反向旋转以保持垂直
-  const textRotation = -baseRotation - wheelRotation
+  const rotate = (index * 360) / foodList.length
   return {
-    transform: `rotate(${textRotation}deg)`,
-    transformOrigin: 'center'
+    transform: `rotate(${-rotate - wheelRotation + 90}deg)`
   }
 }
 
@@ -66,19 +76,26 @@ const startRotation = () => {
   isRotating.value = true
   currentResult.value = ''
 
-  const randomRotations = 5 + Math.floor(Math.random() * 5) // 5-10圈
-  const extraDegrees = Math.random() * 360
-  const totalRotation = randomRotations * 360 + extraDegrees
+  // 重置当前角度
+  wheelRotation.value = 0
+  
+  // 使用 nextTick 确保角度重置已生效
+  nextTick(() => {
+    const randomRotations = 5 + Math.floor(Math.random() * 5) // 5-10圈
+    const extraDegrees = Math.random() * 360
+    const totalRotation = randomRotations * 360 + extraDegrees
 
-  wheelRotation.value = totalRotation
+    // 设置新的旋转角度
+    wheelRotation.value = totalRotation
 
-  setTimeout(() => {
-    isRotating.value = false
-    const finalPosition = totalRotation % 360
-    const sectionSize = 360 / foodList.length
-    const selectedIndex = Math.floor(finalPosition / sectionSize)
-    currentResult.value = foodList[selectedIndex]
-  }, 3000)
+    setTimeout(() => {
+      isRotating.value = false
+      const finalPosition = totalRotation % 360
+      const sectionSize = 360 / foodList.length
+      const selectedIndex = foodList.length - Math.floor(finalPosition / sectionSize) - 1
+      currentResult.value = foodList[selectedIndex]
+    }, 3000)
+  })
 }
 </script>
 
@@ -138,17 +155,13 @@ const startRotation = () => {
   left: 50%;
   top: 50%;
   transform-origin: 0% 0%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .wheel-text {
   position: absolute;
-  left: 60%;
-  /* 调整文字位置 */
-  top: 25%;
-  /* 调整文字位置 */
+  left: 70%;
+  top: 30%;
+  transform-origin: left center;
   font-size: 14px;
   color: #333;
   font-weight: bold;
@@ -194,13 +207,32 @@ const startRotation = () => {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  transition: transform 0.1s ease;
 }
 
 .pointer-head {
   width: 20px;
   height: 30px;
-  background: #2c3e50;
+  background: #e74c3c;
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  animation: pointerShake 0.3s ease infinite;
+}
+
+@keyframes pointerShake {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+/* 转动时的指针动画 */
+.wheel.rotating + .pointer {
+  animation: pointerVibrate 0.1s ease-in-out infinite;
+}
+
+@keyframes pointerVibrate {
+  0% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(-2deg); }
 }
 
 .result-container {
